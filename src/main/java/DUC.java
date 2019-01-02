@@ -60,8 +60,15 @@ public class DUC {
                 }
 
                 for (Record record : updateables) {
-                    logger.message("Updating record for \"" + record.getName() + "\"");
-                    cloudflare.update(record, ip);
+                    if (record.isReady()) {
+                        logger.message("Updating record for \"" + record.getName() + "\"");
+                        cloudflare.update(record, ip);
+                    }
+                    // if record doesn't have sufficient information, possibly it hasn't been registered at Cloudflare
+                    else {
+                        logger.error("Not enough information for \"" + record.getName() + "\". Skipping");
+                        updateables.remove(record);
+                    }
                 }
 
                 // setting minttl
